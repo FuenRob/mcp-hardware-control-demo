@@ -1,2 +1,4 @@
 typescript/node_modules
 typescript/build
+go/main.exe
+go/hardware-control.exe
