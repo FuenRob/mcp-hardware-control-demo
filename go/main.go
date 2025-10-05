@@ -83,7 +83,8 @@ func getBrightness() string {
 	var cmd *exec.Cmd
 	current := 50 // Valor por defecto
 
-	if osType == "windows" {
+	switch osType {
+	case "windows":
 		// Windows - usando PowerShell
 		script := "(Get-WmiObject -Namespace root/WMI -Class WmiMonitorBrightness).CurrentBrightness"
 		cmd = exec.Command("powershell", "-Command", script)
@@ -93,7 +94,7 @@ func getBrightness() string {
 		}
 		val, _ := strconv.Atoi(strings.TrimSpace(string(output)))
 		current = val
-	} else if osType == "darwin" {
+	case "darwin":
 		// macOS - usando AppleScript
 		script := "tell application \"System Events\" to get brightness of item 1 of (get displays)"
 		cmd = exec.Command("osascript", "-e", script)
@@ -103,7 +104,7 @@ func getBrightness() string {
 		}
 		val, _ := strconv.ParseFloat(strings.TrimSpace(string(output)), 64)
 		current = int(val * 100)
-	} else {
+	default:
 		// Linux - xrandr no devuelve brillo fácilmente
 		return "⚠️ Obtener brillo no implementado en Linux (usa xrandr manualmente)"
 	}
@@ -119,7 +120,8 @@ func playSystemSound(soundType string) string {
 
 	var cmd *exec.Cmd
 
-	if osType == "windows" {
+	switch osType {
+	case "windows":
 		// Windows - usando PowerShell Beep
 		frequencies := map[string][2]int{
 			"beep":    {1000, 500},
@@ -136,7 +138,7 @@ func playSystemSound(soundType string) string {
 
 		script := fmt.Sprintf("[console]::beep(%d,%d)", freq[0], freq[1])
 		cmd = exec.Command("powershell", "-Command", script)
-	} else if osType == "darwin" {
+	case "darwin":
 		// macOS - usando afplay
 		sounds := map[string]string{
 			"beep":    "/System/Library/Sounds/Ping.aiff",
@@ -152,7 +154,7 @@ func playSystemSound(soundType string) string {
 		}
 
 		cmd = exec.Command("afplay", soundPath)
-	} else {
+	default:
 		// Linux - usando paplay
 		cmd = exec.Command("paplay", "/usr/share/sounds/freedesktop/stereo/complete.oga")
 	}
@@ -168,13 +170,14 @@ func playSystemSound(soundType string) string {
 func openApplication(appName string) string {
 	var cmd *exec.Cmd
 
-	if osType == "windows" {
+	switch osType {
+	case "windows":
 		// Windows - usando start
 		cmd = exec.Command("cmd", "/c", "start", appName)
-	} else if osType == "darwin" {
+	case "darwin":
 		// macOS - usando open
 		cmd = exec.Command("open", "-a", appName)
-	} else {
+	default:
 		// Linux - usando comando directo
 		cmd = exec.Command("sh", "-c", appName+" &")
 	}
